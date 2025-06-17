@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Rápida de Exames</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .result-card {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-6 md:p-8">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Consulta Rápida de Exames</h1>
+            <p class="text-gray-500 mt-1">Selecione um exame para ver os detalhes</p>
+        </div>
+
+        <!-- Exam Selector -->
+        <div class="mb-6">
+            <label for="examSelector" class="block text-sm font-medium text-gray-700 mb-2">Exame Solicitado:</label>
+            <select id="examSelector" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                <option selected disabled>-- Escolha um exame --</option>
+            </select>
+        </div>
+
+        <!-- Results Area -->
+        <div id="results" class="hidden space-y-4">
+            <!-- Fast Medic Name -->
+            <div id="resultCardFastMedic" class="result-card bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 class="font-semibold text-blue-800 mb-2">Nome na Fast Medic</h3>
+                <div class="flex items-center justify-between gap-4">
+                    <p id="fastMedicName" class="text-gray-900 text-sm md:text-base"></p>
+                    <button id="copyButton" class="flex-shrink-0 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors" title="Copiar nome">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+                            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+             <!-- SUS Code -->
+            <div class="result-card bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                <h3 class="font-semibold text-indigo-800 mb-2">Código SUS</h3>
+                <p id="susCode" class="text-gray-900"></p>
+            </div>
+
+            <!-- Preparation -->
+            <div class="result-card bg-green-50 p-4 rounded-lg border border-green-200">
+                <h3 class="font-semibold text-green-800 mb-2">Preparo</h3>
+                <p id="preparation" class="text-gray-900"></p>
+            </div>
+
+            <!-- Delivery Time -->
+            <div class="result-card bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <h3 class="font-semibold text-yellow-800 mb-2">Prazo de Entrega</h3>
+                <p id="deliveryTime" class="text-gray-900"></p>
+            </div>
+             <!-- Special Note -->
+            <div id="noteCard" class="hidden result-card bg-red-50 p-4 rounded-lg border border-red-200">
+                 <h3 class="font-semibold text-red-800 mb-2">Atenção</h3>
+                 <p id="note" class="text-gray-900"></p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Data for the exams, now including data from the PDF
+            const examData = [
+                { solicitado: "Ácido Fólico", fastMedic: "DOSAGEM DE ÁCIDO FÓLICO", preparo: "Jejum aconselhável de 4 horas", prazo: "08 DIAS ÚTEIS", codigoSus: "--" },
+                { solicitado: "Ácido Úrico", fastMedic: "DOSAGEM DE ACIDO URICO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010120" },
+                { solicitado: "Ácido valproico", fastMedic: "DOSAGEM DE ACIDO VALPROICO", preparo: "Sem jejum obrigatório.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202070050" },
+                { solicitado: "Albumina", fastMedic: "ALBUMINA SÉRICA (Agendar como Proteinas Totais e Frações)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202011000" },
+                { solicitado: "ALT (TGP)", fastMedic: "DOSAGEM DE TRANSAMINASE GLUTAMICO-PIRUVICA (TGP)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010651" },
+                { solicitado: "Amilase", fastMedic: "DOSAGEM DE AMILASE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010180" },
+                { solicitado: "Anti TIREOGLOBULINA", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Anti-Estreptolisina - ASO", fastMedic: "PESQUISA DE ANTICORPOS ANTIESTREPTOLISINA O (ASLO)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030474" },
+                { solicitado: "AST (TGO)", fastMedic: "DOSAGEM DE TRANSAMINASE GLUTAMICO-OXALACETICA (TGO)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010643" },
+                { solicitado: "BACTERIOSCOPIA PARA BAAR", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "BACILOSCOPIA PARA HANSENÍASE", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Bacterioscopia (Gram, Ziehl)", fastMedic: "BACTERIOSCOPIA (GRAM)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202080072" },
+                { solicitado: "Beta HCG Sérico", fastMedic: "DOSAGEM DE GONADOTROFINA CORIONICA HUMANA (HCG, BETA HCG)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060217" },
+                { solicitado: "Bilirrubina total e frações", fastMedic: "DOSAGEM DE BILIRRUBINA TOTAL E FRACOES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010201" },
+                { solicitado: "Cálcio total / sérico", fastMedic: "DOSAGEM DE CALCIO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202010210" },
+                { solicitado: "Capacidade Latente de fixação de ferro", fastMedic: "DOSAGEM DE CAPACIDADE LATENTE DE FIXAÇÃO DO FERRO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202011001" },
+                { solicitado: "Capacidade Total de fixação de ferro", fastMedic: "DETERMINACAO DE CAPACIDADE DE FIXACAO DO FERRO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202010023" },
+                { solicitado: "Carbamazepina", fastMedic: "DOSAGEM DE CARBAMAZΕΡΙΝΑ", preparo: "Sem jejum obrigatório. Colher preferencialmente antes da próxima dose.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202070158" },
+                { solicitado: "CHIKUNGUNYA (ANTICORPOS ANTI-CHIKUNGUNYA IGM)", fastMedic: "ANTICORPOS ANTI-CHIKUNGUNYA IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030903" },
+                { solicitado: "Citomegalovirus - Anticorpos IGG", fastMedic: "PESQUISA DE ANTICORPOS IGG ANTICITOMEGALOVIRUS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030741" },
+                { solicitado: "Citomegalovirus - Anticorpos IGM", fastMedic: "PESQUISA DE ANTICORPOS IGM ANTICITOMEGALOVIRUS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030857" },
+                { solicitado: "Clearance de creatinina (CLEAR)", fastMedic: "CLEARANCE DE CREATININA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202050025" },
+                { solicitado: "Cloro / Cloreto", fastMedic: "DOSAGEM DE CLORETO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010260" },
+                { solicitado: "Coagulograma", fastMedic: "COAGULOGRAMA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202021000" },
+                { solicitado: "Colesterol HDL", fastMedic: "DOSAGEM DE COLESTEROL HDL", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010279" },
+                { solicitado: "Colesterol LDL", fastMedic: "DOSAGEM DE COLESTEROL LDL", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010287" },
+                { solicitado: "Colesterol total", fastMedic: "DOSAGEM DE COLESTEROL TOTAL", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010295" },
+                { solicitado: "Colesterol VLDL", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Contagem de reticulócitos", fastMedic: "CONTAGEM DE RETICULOCITOS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020037" },
+                { solicitado: "Coombs direto", fastMedic: "TESTE DIRETO DE ANTIGLOBULINA HUMana (TAD)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020541" },
+                { solicitado: "Coombs indireto", fastMedic: "TESTE INDIRETO DE ANTIGLOBULINA HUMANA (TIA)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202120090" },
+                { solicitado: "Creatinina", fastMedic: "DOSAGEM DE CREATININA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010317" },
+                { solicitado: "CULTURA DE SECREÇÃO EM GERAL", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Cultura de fezes", fastMedic: "CULTURA AUTOMATIZADA DE FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202081001" },
+                { solicitado: "Cultura de orofaringe", fastMedic: "CULTURA AUTOMATIZADA OROFARINGE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202081003" },
+                { solicitado: "Cultura para fungos", fastMedic: "CULTURA PARA IDENTIFICAÇÃO DE FUNGOS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202080137" },
+                { solicitado: "Dengue (Isolamento Viral)", fastMedic: "ISOLAMENTO VIRAL DA DENGUE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "30 DIAS ÚTEIS", codigoSus: "Sem Cod" },
+                { solicitado: "Dengue (NS1)", fastMedic: "DETECÇÃO DO ANTIGENO NS1 DENGUE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "Sem Cod" },
+                { solicitado: "Dengue IGG", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Dengue IGM / Sorologia para Dengue", fastMedic: "ANTICORPOS ANTI-DENGUE IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030792" },
+                { solicitado: "DESIDROGENASE LÁCTICA - LDH", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Doença de Chagas (IGG)", fastMedic: "PESQUISA DE ANTICORPOS IGG ANTITRYPANOSOMA CRUZI CHAGAS IGG", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030900" },
+                { solicitado: "Doença de Chagas (IGM)", fastMedic: "PESQUISA DE ANTICORPOS IGM ANTITRYPANOSOMA CRUZI CHAGAS IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030901" },
+                { solicitado: "Eletroforese de hemoglobina", fastMedic: "ELETROFORESE DE HEMOGLOBINA", preparo: "Sem jejum obrigatório ou preparo específico. COLHER 1 EDTA EXCLUSIVO PARA ESTE EXAME.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202020355" },
+                { solicitado: "ELETROFORESE DE PROTEÍNAS", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Eletrólitos (Sódio, Potássio, Cloro)", fastMedic: "Ver exames individuais", preparo: "Ver exames individuais", prazo: "Ver exames individuais", note: "Selecione Sódio, Potássio e Cloreto individualmente na lista.", codigoSus: "N/A" },
+                { solicitado: "ERITROGRAMA", fastMedic: "ERITROGRAMA (ERITROCITOS, HEMOGLOBINA, HEMATOCRITO)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", note: "Cadastrar como HEM.", codigoSus: "0202020363" },
+                { solicitado: "ESTRADIOL", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "FAN (Fator Antinúcleo)", fastMedic: "PESQUISA DE ANTICORPOS ANTINUCLEO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030598" },
+                { solicitado: "Fator reumatóide", fastMedic: "DETERMINACAO DE FATOR REUMATOIDE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030075" },
+                { solicitado: "Fenitoina", fastMedic: "DOSAGEM DE FENITOINA", preparo: "Sem jejum obrigatório. Colher preferencialmente antes da próxima dose.", prazo: "08 DIAS ÚTEIS", codigoSus: "202070220" },
+                { solicitado: "Fenobarbital", fastMedic: "DOSAGEM DE FENOBARBITAL", preparo: "Sem jejum obrigatório. Colher preferencialmente antes da próxima dose.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202071000" },
+                { solicitado: "Ferritina", fastMedic: "DOSAGEM DE FERRITΙΝΑ", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202010384" },
+                { solicitado: "Ferro sérico", fastMedic: "DOSAGEM DE FERRO SERICO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202010392" },
+                { solicitado: "Fosfatase alcalina", fastMedic: "DOSAGEM DE FOSFATASE ALCALINA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010422" },
+                { solicitado: "FSH", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "FTABS IGG (Sífilis)", fastMedic: "TESTE FTA-ABS IGG P/DIAGNOSTICO DA SIFILIS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202031128" },
+                { solicitado: "FTABS IGM (Sífilis)", fastMedic: "TESTE FTA-ABS IGM P/ DIAGNOSTICO DA SIFILIS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202031136" },
+                { solicitado: "Função Hepática / Hepatograma", fastMedic: "Ver exames individuais", preparo: "Ver exames individuais", prazo: "Ver exames individuais", note: "Selecione ALT(TGP), AST(TGO), Gama GT, Bilirrubinas, Fosfatase Alcalina e Albumina individualmente.", codigoSus: "N/A" },
+                { solicitado: "Função Renal (Ureia e Creatinina)", fastMedic: "Ver exames individuais", preparo: "Ver exames individuais", prazo: "Ver exames individuais", note: "Selecione Uréia e Creatinina individualmente na lista.", codigoSus: "N/A" },
+                { solicitado: "Gama gt-gama glutamiltransferase", fastMedic: "DOSAGEM DE GAMA-GLUTAMIL-TRANSFERASE (GAMA GT)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010465" },
+                { solicitado: "Glicose / Glicemia", fastMedic: "DOSAGEM DE GLICOSE", preparo: "Jejum de 8 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010473" },
+                { solicitado: "GLICOSE PÓS-PRANDIAL", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Grupo sanguineo/fatorRh (GRUPO ABO)", fastMedic: "DETERMINACAO DIRETA E REVERSA DE GRUPO ABO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202120023" },
+                { solicitado: "H. PYLORI", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "HEMOGLOBINA GLICADA / Glicosilada", fastMedic: "DOSAGEM DE HEMOGLOBINA GLICOSILADA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202010503" },
+                { solicitado: "Hemograma completo", fastMedic: "HEMOGRAMA COMPLETO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020380" },
+                { solicitado: "HEPATITE A ANTI HAV IGG", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "HEPATITE A ANTI HAV IGM", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Hepatite B - anti HBC IGG", fastMedic: "PESQUISA DE ANTIC. IGG E IGM CONTRA ANTIGENO CENTRAL DO VIRUS DA HEPATITE B", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "202030784" },
+                { solicitado: "HEPATITE B ANTI HBC IGM", fastMedic: "PESQUISA DE ANTIC. IGG E IGM CONTRA ANTIGENO CENTRAL DO VIRUS DA HEPATITE B", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "202030784", note: "Mesmo código do IGG" },
+                { solicitado: "Hepatite B - anti HBE", fastMedic: "ISA DE ANTICORPOS CONTRA ANTIGENO E DO VIRUS DA HEPATITE B (ANT", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "202030644" },
+                { solicitado: "Hepatite B - anti HBS", fastMedic: "PESQUISA DE ANTICORPOS CONTRA ANTIGENO DE SUPERFICIE DO VIRUS DA HEPATITE B (ANTI-HBS)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030636" },
+                { solicitado: "Hepatite B - HBEAG", fastMedic: "PESQUISA DE ANTIGENO E DO VIRUS DA HEPATITE B (HBEAG)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "202030989" },
+                { solicitado: "Hepatite B - HBSAG", fastMedic: "ESQUISA DE ANTIGENO DE SUPERFICIE DO VIRUS DA HEPATITE B (HBSAG)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030784" },
+                { solicitado: "Hepatite C - anti HCV", fastMedic: "PESQUISA DE ANTICORPOS CONTRA O VIRUS DA HEPATITE C (ANTI-HCV)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030679" },
+                { solicitado: "HERPES IGG", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "HERPES IGM", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "HIV 1 e 2", fastMedic: "PESQUISA DE ANTICORPOS ANTI-HIV-1+ HIV-2 (ELISA)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030300" },
+                { solicitado: "HIV-Western BLOT", fastMedic: "PESQUISA DE ANTICORPOS ANTI-HIV-1 (WESTERN BLOT)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030296" },
+                { solicitado: "Indice de saturação de transferrina - IST", fastMedic: "DOSAGEM DO INDICE DE SATURAÇÃO DA TRANSFERRINA", preparo: "Jejum de 8 horas", prazo: "08 DIAS ÚTEIS", codigoSus: "0202011009" },
+                { solicitado: "k-39 (Teste Rápido Leishmaniose)", fastMedic: "TESTE RAPIDO LEISHMANIOSE K39", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "202030903" },
+                { solicitado: "Leishmaniose (Sorologia)", fastMedic: "SOROLOGIA PARA LEISHMANIOSE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "Sem Cod" },
+                { solicitado: "LEUCOGRAMA", fastMedic: "LEUCOGRAMA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020398" },
+                { solicitado: "LH", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Lipase", fastMedic: "DOSAGEM DE LIPASE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010554" },
+                { solicitado: "Lipidograma (Colesterol e Triglicerídeos)", fastMedic: "Ver exames individuais", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", note: "Selecione Colesterol Total, HDL, LDL e Triglicerídeos individualmente.", codigoSus: "N/A" },
+                { solicitado: "Litio", fastMedic: "DOSAGEM DE LITIO", preparo: "Jejum de 8 horas. Recomenda-se a coleta 12 horas após a administração do medicamento", prazo: "08 DIAS ÚTEIS", codigoSus: "0202070255" },
+                { solicitado: "Microalbuminúria 24 horas", fastMedic: "DOSAGEM DE MICROALBUMINURIA NA URINA DE 24H", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202050888" },
+                { solicitado: "Microalbuminúria urina recente", fastMedic: "DOSAGEM DE MICROALBUMINURIA EM AMOSTRA DE URINA ISOLADA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202050889" },
+                { solicitado: "Parasitológico", fastMedic: "PARASITOLÓGICO", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "PCR (Proteina C reativa)", fastMedic: "DETERMINACAO QUANTITATIVA DE PROTEINA C REATIVA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202030083" },
+                { solicitado: "Pesquisa de DU", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Pesquisa de leucocitos nas fezes", fastMedic: "PESQUISA DE LEUCOCITOS NAS FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202040097" },
+                { solicitado: "Pesquisa de rotavirus", fastMedic: "PESQUISA DE ROTAVIRUS NAS FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202040135" },
+                { solicitado: "Pesquisa de sangue oculto nas fezes", fastMedic: "PESQUISA DE SANGUE OCULTO NAS FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202040143" },
+                { solicitado: "Pesquisa de substância redutora nas fezes", fastMedic: "PESQUISA DE SUBSTANCIAS REDUTORAS NAS FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202040151" },
+                { solicitado: "PH FECAL", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "PLAQUETAS", fastMedic: "CONTAGEM DE PLAQUETAS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020029" },
+                { solicitado: "Potássio", fastMedic: "DOSAGEM DE POTASSIO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010600" },
+                { solicitado: "PROGESTERONA", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Prolactina", fastMedic: "DOSAGEM DE PROLACTINA", preparo: "Jejum aconselhável de 4 horas. Manter paciente em repouso 30 minutos antes da coleta.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202060306" },
+                { solicitado: "Proteinas totais e frações", fastMedic: "DOSAGEM DE PROTEINAS TOTAIS E FRACOES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010627" },
+                { solicitado: "Proteinúria 24 horas", fastMedic: "DOSAGEM DE PROTEINAS (URINA DE 24 HORAS)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202050114" },
+                { solicitado: "PROVA DO LAÇO", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "PSA LIVRE E TOTAL", fastMedic: "DOSAGEM DE ANTIGNO PROSTATICO ESPECIFICO (PSA)", preparo: "Ver preparo de PSA TOTAL", prazo: "05 DIAS ÚTEIS", codigoSus: "202030105" },
+                { solicitado: "PSA TOTAL", fastMedic: "DOSAGEM DE ANTIGNO PROSTATICO ESPECIFICO (PSA)", preparo: "Jejum de 4 horas. Durante três dias antes da coleta do exames evitar, atividade sexual, exercicios fisicos, andar de moto e/ou bicicleta, andar a cavalo e usar supositórios. Caso tenha realizado os procedimentos ultrasom da prostata, colonoscopía, retossigmoidoscopia. estudo urodinamico, cistoscopia ou biopsia de próstata esperar 30 dias para coletar o exame.", prazo: "05 DIAS ÚTEIS", codigoSus: "202030105" },
+                { solicitado: "Relação albumina/creatinina na urina recente", fastMedic: "RELACAO ALBUMINA CREATINNINA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202050890" },
+                { solicitado: "Rubéola IGG", fastMedic: "PESQUISA DE ANTICORPOS IGG CONTRA O VIRUS DA RUBEOLA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030814" },
+                { solicitado: "Rubéola IGM", fastMedic: "PESQUISA DE ANTICORPOS IGM CONTRA O VIRUS DA RUBEOLA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030920" },
+                { solicitado: "Sarampo (Sorologia IGG e IGM)", fastMedic: "SOROLOGIA PARA SARAMPO IGG E IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "30 DIAS ÚTEIS", codigoSus: "202030695" },
+                { solicitado: "SDHEA", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Sódio", fastMedic: "DOSAGEM DE SODIO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010635" },
+                { solicitado: "Sumário de urina (Urina Tipo 1, EAS)", fastMedic: "ANALISE DE CARACTERES FISICOS, ELEMENTOS E SEDIMENTO DA URINA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202050017" },
+                { solicitado: "T3", fastMedic: "DOSAGEM DE TRIIODOTIRONINA (T3)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060390" },
+                { solicitado: "T4", fastMedic: "DOSAGEM DE TIROXINA (T4)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060373" },
+                { solicitado: "T4 livre", fastMedic: "DOSAGEM DE TIROXINA LIVRE (T4 LIVRE)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060381" },
+                { solicitado: "TAP (Tempo de atividade de protrombina)", fastMedic: "DETERMINACAO DE TEMPO E ATIVIDADE DA PROTROMBINA (TAP)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020142" },
+                { solicitado: "TEMPO DE SANGRAMENTO", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "TESTOSTERONA TOTAL", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Teste de tolerância a glicose (75g 2h)", fastMedic: "DETERMINAÇÃO DE CURVA GLICEMICA 2DOSAGENS", preparo: "Jejum de 8 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "202010040" },
+                { solicitado: "Teste de tolerância a glicose (50g 1h)", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "TIREOGLOBULINA", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Toxoplasmose - Teste de Avidez", fastMedic: "TESTE DE AVIDEZ PARA TOXOPLASMOSE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "213019999" },
+                { solicitado: "Toxoplasmose IGG", fastMedic: "PESQUISA DE ANTICORPOS IGG ANTITOXOPLASMA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030768" },
+                { solicitado: "Toxoplasmose IGM", fastMedic: "PESQUISA DE ANTICORPOS IGM ANTITOXOPLASMA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030873" },
+                { solicitado: "Transferrina", fastMedic: "Transferrina", preparo: "Jejum aconselhável de 4 horas.", prazo: "08 DIAS ÚTEIS", codigoSus: "--" },
+                { solicitado: "Triglicerides", fastMedic: "DOSAGEM DE TRIGLICERIDEOS", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010678" },
+                { solicitado: "TSH", fastMedic: "DOSAGEM DE HORMONIO TIREOESTIMULANTE (TSH)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060250" },
+                { solicitado: "TTPA (Tempo de tromboplastina parcial ativo)", fastMedic: "DETERMINACAO DE TEMPO DE TROMBOPLASTINA PARCIAL ATIVADA (TTP ATIVADA)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020134" },
+                { solicitado: "Uréia", fastMedic: "DOSAGEM DE UREIA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010694" },
+                { solicitado: "Urinocultura", fastMedic: "CULTURA AUTOMATIZADA DE URINA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202081005" },
+                { solicitado: "VDRL", fastMedic: "VDRL P/DETECCÃO DE SIFILIS EM GESTANTE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202031179" },
+                { solicitado: "VHS", fastMedic: "DETERMINACAO DE VELOCIDADE DE HEMOSSEDIMENTACAO (VHS)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202020150" },
+                { solicitado: "Vitamina B12", fastMedic: "DOSAGEM DE VITAMINA B12", preparo: "Jejum aconselhável de 4 horas", prazo: "08 DIAS ÚTEIS", codigoSus: "--" },
+                { solicitado: "Vitamina D (25 OH)", fastMedic: "DOSAGEM DE 25-HIDROXIVITAMINA D", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "--" },
+                { solicitado: "WAALER ROSE", fastMedic: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
+                { solicitado: "Zika (PCR para Zika Virus)", fastMedic: "PCR PARA ZIKA VIRUS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "30 DIAS ÚTEIS", codigoSus: "Sem Cod" },
+                { solicitado: "Zika (Sorologia para Zika - IGM)", fastMedic: "ANTICORPOS ANTI-ZIKA IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030903" }
+            ];
+
+
+            // Get elements from the DOM
+            const selector = document.getElementById('examSelector');
+            const resultsDiv = document.getElementById('results');
+            const fastMedicNameEl = document.getElementById('fastMedicName');
+            const susCodeEl = document.getElementById('susCode');
+            const preparationEl = document.getElementById('preparation');
+            const deliveryTimeEl = document.getElementById('deliveryTime');
+            const copyButton = document.getElementById('copyButton');
+            const noteCard = document.getElementById('noteCard');
+            const noteEl = document.getElementById('note');
+
+            // --- Function to create a comprehensive list including aliases ---
+            function createComprehensiveList(data) {
+                const comprehensiveData = [];
+                const seen = new Set();
+
+                data.forEach(exam => {
+                    // Add the main exam name if not already added
+                    if (!seen.has(exam.solicitado.toLowerCase())) {
+                        comprehensiveData.push(exam);
+                        seen.add(exam.solicitado.toLowerCase());
+                    }
+
+                    // Add aliases from description, e.g. "Glicose / Glicemia"
+                    const aliasesInDesc = exam.solicitado.split('/').map(s => s.trim());
+                    if (aliasesInDesc.length > 1) {
+                        aliasesInDesc.forEach(alias => {
+                            if (!seen.has(alias.toLowerCase())) {
+                                comprehensiveData.push({ ...exam, solicitado: alias });
+                                seen.add(alias.toLowerCase());
+                            }
+                        });
+                    }
+                });
+                 return comprehensiveData;
+            }
+
+            const comprehensiveExamData = createComprehensiveList(examData);
+
+            // Sort data alphabetically by the 'solicitado' property
+            comprehensiveExamData.sort((a, b) => a.solicitado.localeCompare(b.solicitado));
+
+            // Populate the dropdown with exam options
+            comprehensiveExamData.forEach((exam, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = exam.solicitado;
+                selector.appendChild(option);
+            });
+
+            // Listen for changes on the selector
+            selector.addEventListener('change', () => {
+                const selectedIndex = selector.value;
+                if (selectedIndex) {
+                    const selectedExam = comprehensiveExamData[selectedIndex];
+
+                    // Populate the result fields
+                    fastMedicNameEl.textContent = selectedExam.fastMedic;
+                    susCodeEl.textContent = selectedExam.codigoSus || '--';
+                    preparationEl.textContent = selectedExam.preparo;
+                    deliveryTimeEl.textContent = selectedExam.prazo;
+
+                    // Handle special note
+                    if (selectedExam.note) {
+                        noteEl.textContent = selectedExam.note;
+                        noteCard.classList.remove('hidden');
+                    } else {
+                        noteCard.classList.add('hidden');
+                    }
+                    
+                    // Show the results section
+                    resultsDiv.classList.remove('hidden');
+
+                } else {
+                    // Hide results if the default option is selected
+                    resultsDiv.classList.add('hidden');
+                }
+            });
+
+            // Handle the copy button click
+            copyButton.addEventListener('click', () => {
+                const textToCopy = fastMedicNameEl.textContent;
+                // Use a temporary textarea to securely copy to clipboard
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = textToCopy;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                try {
+                    document.execCommand('copy');
+                    // Visual feedback
+                    const originalText = copyButton.innerHTML;
+                    copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>`;
+                    copyButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                    copyButton.classList.add('bg-green-500');
+                    
+                    setTimeout(() => {
+                        copyButton.innerHTML = originalText;
+                        copyButton.classList.remove('bg-green-500');
+                        copyButton.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                    }, 2000);
+
+                } catch (err) {
+                    console.error('Falha ao copiar texto: ', err);
+                }
+                document.body.removeChild(tempTextArea);
+            });
+        });
+    </script>
+</body>
+</html>
