@@ -51,13 +51,13 @@
 
         <!-- Results Area -->
         <div id="results" class="hidden space-y-4">
-            <!-- System Exam Name -->
+            <!-- Fast Medic Name -->
             <div class="result-card bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 class="font-semibold text-blue-800 mb-2">Nome do Exame no Sistema</h3>
+                <h3 class="font-semibold text-blue-800 mb-2">Nome na Fast Medic</h3>
                 <div class="flex items-center justify-between gap-4">
-                    <p id="systemExamName" class="text-gray-900 text-sm md:text-base"></p>
+                    <p id="fastMedicName" class="text-gray-900 text-sm md:text-base"></p>
                     <button id="copyButton" class="flex-shrink-0 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors" title="Copiar nome">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+                        <svg xmlns="http://www.w.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
                             <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
                             <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
                         </svg>
@@ -93,154 +93,123 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Data for the exams
+            // Data for the exams from the PDF
             const examData = [
-                { solicitado: "Ácido Fólico", nomeSistema: "DOSAGEM DE ÁCIDO FÓLICO", preparo: "Jejum aconselhável de 4 horas", prazo: "08 DIAS ÚTEIS", codigoSus: "--" },
-                { solicitado: "Ácido Úrico", nomeSistema: "DOSAGEM DE ACIDO URICO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010120" },
-                { solicitado: "Ácido valproico", nomeSistema: "DOSAGEM DE ACIDO VALPROICO", preparo: "Sem jejum obrigatório.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202070050" },
-                { solicitado: "Albumina", nomeSistema: "ALBUMINA SÉRICA (Agendar como Proteinas Totais e Frações)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202011000" },
-                { solicitado: "ALT (TGP)", nomeSistema: "DOSAGEM DE TRANSAMINASE GLUTAMICO-PIRUVICA (TGP)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010651" },
-                { solicitado: "Amilase", nomeSistema: "DOSAGEM DE AMILASE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010180" },
-                { solicitado: "Anti TIREOGLOBULINA", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Anti-Estreptolisina - ASO", nomeSistema: "PESQUISA DE ANTICORPOS ANTIESTREPTOLISINA O (ASLO)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030474" },
-                { solicitado: "AST (TGO)", nomeSistema: "DOSAGEM DE TRANSAMINASE GLUTAMICO-OXALACETICA (TGO)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010643" },
-                { solicitado: "BACTERIOSCOPIA PARA BAAR", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "BACILOSCOPIA PARA HANSENÍASE", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Bacterioscopia (Gram, Ziehl)", nomeSistema: "BACTERIOSCOPIA (GRAM)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202080072" },
-                { solicitado: "Beta HCG Sérico", nomeSistema: "DOSAGEM DE GONADOTROFINA CORIONICA HUMANA (HCG, BETA HCG)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060217" },
-                { solicitado: "Bilirrubina total e frações", nomeSistema: "DOSAGEM DE BILIRRUBINA TOTAL E FRACOES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010201" },
-                { solicitado: "Cálcio total / sérico", nomeSistema: "DOSAGEM DE CALCIO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202010210" },
-                { solicitado: "Capacidade Latente de fixação de ferro", nomeSistema: "DOSAGEM DE CAPACIDADE LATENTE DE FIXAÇÃO DO FERRO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202011001" },
-                { solicitado: "Capacidade Total de fixação de ferro", nomeSistema: "DETERMINACAO DE CAPACIDADE DE FIXACAO DO FERRO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202010023" },
-                { solicitado: "Carbamazepina", nomeSistema: "DOSAGEM DE CARBAMAZΕΡΙΝΑ", preparo: "Sem jejum obrigatório. Colher preferencialmente antes da próxima dose.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202070158" },
-                { solicitado: "CHIKUNGUNYA (ANTICORPOS ANTI-CHIKUNGUNYA IGM)", nomeSistema: "ANTICORPOS ANTI-CHIKUNGUNYA IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030903" },
-                { solicitado: "Citomegalovirus - Anticorpos IGG", nomeSistema: "PESQUISA DE ANTICORPOS IGG ANTICITOMEGALOVIRUS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030741" },
-                { solicitado: "Citomegalovirus - Anticorpos IGM", nomeSistema: "PESQUISA DE ANTICORPOS IGM ANTICITOMEGALOVIRUS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030857" },
-                { solicitado: "Clearance de creatinina (CLEAR)", nomeSistema: "CLEARANCE DE CREATININA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202050025" },
-                { solicitado: "Cloro / Cloreto", nomeSistema: "DOSAGEM DE CLORETO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010260" },
-                { solicitado: "Coagulograma", nomeSistema: "COAGULOGRAMA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202021000" },
-                { solicitado: "Colesterol HDL", nomeSistema: "DOSAGEM DE COLESTEROL HDL", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010279" },
-                { solicitado: "Colesterol LDL", nomeSistema: "DOSAGEM DE COLESTEROL LDL", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010287" },
-                { solicitado: "Colesterol total", nomeSistema: "DOSAGEM DE COLESTEROL TOTAL", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010295" },
-                { solicitado: "Colesterol VLDL", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Contagem de reticulócitos", nomeSistema: "CONTAGEM DE RETICULOCITOS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020037" },
-                { solicitado: "Coombs direto", nomeSistema: "TESTE DIRETO DE ANTIGLOBULINA HUMana (TAD)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020541" },
-                { solicitado: "Coombs indireto", nomeSistema: "TESTE INDIRETO DE ANTIGLOBULINA HUMANA (TIA)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202120090" },
-                { solicitado: "Creatinina", nomeSistema: "DOSAGEM DE CREATININA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010317" },
-                { solicitado: "CULTURA DE SECREÇÃO EM GERAL", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Cultura de fezes", nomeSistema: "CULTURA AUTOMATIZADA DE FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202081001" },
-                { solicitado: "Cultura de orofaringe", nomeSistema: "CULTURA AUTOMATIZADA OROFARINGE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202081003" },
-                { solicitado: "Cultura para fungos", nomeSistema: "CULTURA PARA IDENTIFICAÇÃO DE FUNGOS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202080137" },
-                { solicitado: "Dengue (Isolamento Viral)", nomeSistema: "ISOLAMENTO VIRAL DA DENGUE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "30 DIAS ÚTEIS", codigoSus: "Sem Cod" },
-                { solicitado: "Dengue (NS1)", nomeSistema: "DETECÇÃO DO ANTIGENO NS1 DENGUE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "Sem Cod" },
-                { solicitado: "Dengue IGG", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Dengue IGM / Sorologia para Dengue", nomeSistema: "ANTICORPOS ANTI-DENGUE IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030792" },
-                { solicitado: "DESIDROGENASE LÁCTICA - LDH", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Doença de Chagas (IGG)", nomeSistema: "PESQUISA DE ANTICORPOS IGG ANTITRYPANOSOMA CRUZI CHAGAS IGG", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030900" },
-                { solicitado: "Doença de Chagas (IGM)", nomeSistema: "PESQUISA DE ANTICORPOS IGM ANTITRYPANOSOMA CRUZI CHAGAS IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030901" },
-                { solicitado: "Eletroforese de hemoglobina", nomeSistema: "ELETROFORESE DE HEMOGLOBINA", preparo: "Sem jejum obrigatório ou preparo específico. COLHER 1 EDTA EXCLUSIVO PARA ESTE EXAME.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202020355" },
-                { solicitado: "ELETROFORESE DE PROTEÍNAS", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Eletrólitos (Sódio, Potássio, Cloro)", nomeSistema: "Ver exames individuais", preparo: "Ver exames individuais", prazo: "Ver exames individuais", note: "Selecione Sódio, Potássio e Cloreto individualmente na lista.", codigoSus: "N/A" },
-                { solicitado: "ERITROGRAMA", nomeSistema: "ERITROGRAMA (ERITROCITOS, HEMOGLOBINA, HEMATOCRITO)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", note: "Cadastrar como HEM.", codigoSus: "0202020363" },
-                { solicitado: "ESTRADIOL", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "FAN (Fator Antinúcleo)", nomeSistema: "PESQUISA DE ANTICORPOS ANTINUCLEO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030598" },
-                { solicitado: "Fator reumatóide", nomeSistema: "DETERMINACAO DE FATOR REUMATOIDE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030075" },
-                { solicitado: "Fenitoina", nomeSistema: "DOSAGEM DE FENITOINA", preparo: "Sem jejum obrigatório. Colher preferencialmente antes da próxima dose.", prazo: "08 DIAS ÚTEIS", codigoSus: "202070220" },
-                { solicitado: "Fenobarbital", nomeSistema: "DOSAGEM DE FENOBARBITAL", preparo: "Sem jejum obrigatório. Colher preferencialmente antes da próxima dose.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202071000" },
-                { solicitado: "Ferritina", nomeSistema: "DOSAGEM DE FERRITΙΝΑ", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202010384" },
-                { solicitado: "Ferro sérico", nomeSistema: "DOSAGEM DE FERRO SERICO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202010392" },
-                { solicitado: "Fosfatase alcalina", nomeSistema: "DOSAGEM DE FOSFATASE ALCALINA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010422" },
-                { solicitado: "FSH", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "FTABS IGG (Sífilis)", nomeSistema: "TESTE FTA-ABS IGG P/DIAGNOSTICO DA SIFILIS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202031128" },
-                { solicitado: "FTABS IGM (Sífilis)", nomeSistema: "TESTE FTA-ABS IGM P/ DIAGNOSTICO DA SIFILIS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202031136" },
-                { solicitado: "Função Hepática / Hepatograma", nomeSistema: "Ver exames individuais", preparo: "Ver exames individuais", prazo: "Ver exames individuais", note: "Selecione ALT(TGP), AST(TGO), Gama GT, Bilirrubinas, Fosfatase Alcalina e Albumina individualmente.", codigoSus: "N/A" },
-                { solicitado: "Função Renal (Ureia e Creatinina)", nomeSistema: "Ver exames individuais", preparo: "Ver exames individuais", prazo: "Ver exames individuais", note: "Selecione Uréia e Creatinina individualmente na lista.", codigoSus: "N/A" },
-                { solicitado: "Gama gt-gama glutamiltransferase", nomeSistema: "DOSAGEM DE GAMA-GLUTAMIL-TRANSFERASE (GAMA GT)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010465" },
-                { solicitado: "Glicose / Glicemia", nomeSistema: "DOSAGEM DE GLICOSE", preparo: "Jejum de 8 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010473" },
-                { solicitado: "GLICOSE PÓS-PRANDIAL", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Grupo sanguineo/fatorRh (GRUPO ABO)", nomeSistema: "DETERMINACAO DIRETA E REVERSA DE GRUPO ABO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202120023" },
-                { solicitado: "H. PYLORI", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "HEMOGLOBINA GLICADA / Glicosilada", nomeSistema: "DOSAGEM DE HEMOGLOBINA GLICOSILADA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202010503" },
-                { solicitado: "Hemograma completo", nomeSistema: "HEMOGRAMA COMPLETO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020380" },
-                { solicitado: "HEPATITE A ANTI HAV IGG", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "HEPATITE A ANTI HAV IGM", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Hepatite B - anti HBC IGG", nomeSistema: "PESQUISA DE ANTIC. IGG E IGM CONTRA ANTIGENO CENTRAL DO VIRUS DA HEPATITE B", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "202030784" },
-                { solicitado: "HEPATITE B ANTI HBC IGM", nomeSistema: "PESQUISA DE ANTIC. IGG E IGM CONTRA ANTIGENO CENTRAL DO VIRUS DA HEPATITE B", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "202030784", note: "Mesmo código do IGG" },
-                { solicitado: "Hepatite B - anti HBE", nomeSistema: "ISA DE ANTICORPOS CONTRA ANTIGENO E DO VIRUS DA HEPATITE B (ANT", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "202030644" },
-                { solicitado: "Hepatite B - anti HBS", nomeSistema: "PESQUISA DE ANTICORPOS CONTRA ANTIGENO DE SUPERFICIE DO VIRUS DA HEPATITE B (ANTI-HBS)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030636" },
-                { solicitado: "Hepatite B - HBEAG", nomeSistema: "PESQUISA DE ANTIGENO E DO VIRUS DA HEPATITE B (HBEAG)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "202030989" },
-                { solicitado: "Hepatite B - HBSAG", nomeSistema: "ESQUISA DE ANTIGENO DE SUPERFICIE DO VIRUS DA HEPATITE B (HBSAG)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030784" },
-                { solicitado: "Hepatite C - anti HCV", nomeSistema: "PESQUISA DE ANTICORPOS CONTRA O VIRUS DA HEPATITE C (ANTI-HCV)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030679" },
-                { solicitado: "HERPES IGG", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "HERPES IGM", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "HIV 1 e 2", nomeSistema: "PESQUISA DE ANTICORPOS ANTI-HIV-1+ HIV-2 (ELISA)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202030300" },
-                { solicitado: "HIV-Western BLOT", nomeSistema: "PESQUISA DE ANTICORPOS ANTI-HIV-1 (WESTERN BLOT)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030296" },
-                { solicitado: "Indice de saturação de transferrina - IST", nomeSistema: "DOSAGEM DO INDICE DE SATURAÇÃO DA TRANSFERRINA", preparo: "Jejum de 8 horas", prazo: "08 DIAS ÚTEIS", codigoSus: "0202011009" },
-                { solicitado: "k-39 (Teste Rápido Leishmaniose)", nomeSistema: "TESTE RAPIDO LEISHMANIOSE K39", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "202030903" },
-                { solicitado: "Leishmaniose (Sorologia)", nomeSistema: "SOROLOGIA PARA LEISHMANIOSE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "Sem Cod" },
-                { solicitado: "LEUCOGRAMA", nomeSistema: "LEUCOGRAMA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020398" },
-                { solicitado: "LH", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Lipase", nomeSistema: "DOSAGEM DE LIPASE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010554" },
-                { solicitado: "Lipidograma (Colesterol e Triglicerídeos)", nomeSistema: "Ver exames individuais", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", note: "Selecione Colesterol Total, HDL, LDL e Triglicerídeos individualmente.", codigoSus: "N/A" },
-                { solicitado: "Litio", nomeSistema: "DOSAGEM DE LITIO", preparo: "Jejum de 8 horas. Recomenda-se a coleta 12 horas após a administração do medicamento", prazo: "08 DIAS ÚTEIS", codigoSus: "0202070255" },
-                { solicitado: "Microalbuminúria 24 horas", nomeSistema: "DOSAGEM DE MICROALBUMINURIA NA URINA DE 24H", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202050888" },
-                { solicitado: "Microalbuminúria urina recente", nomeSistema: "DOSAGEM DE MICROALBUMINURIA EM AMOSTRA DE URINA ISOLADA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202050889" },
-                { solicitado: "Parasitológico", nomeSistema: "PARASITOLÓGICO", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "PCR (Proteina C reativa)", nomeSistema: "DETERMINACAO QUANTITATIVA DE PROTEINA C REATIVA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202030083" },
-                { solicitado: "Pesquisa de DU", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Pesquisa de leucocitos nas fezes", nomeSistema: "PESQUISA DE LEUCOCITOS NAS FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202040097" },
-                { solicitado: "Pesquisa de rotavirus", nomeSistema: "PESQUISA DE ROTAVIRUS NAS FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202040135" },
-                { solicitado: "Pesquisa de sangue oculto nas fezes", nomeSistema: "PESQUISA DE SANGUE OCULTO NAS FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202040143" },
-                { solicitado: "Pesquisa de substância redutora nas fezes", nomeSistema: "PESQUISA DE SUBSTANCIAS REDUTORAS NAS FEZES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202040151" },
-                { solicitado: "PH FECAL", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "PLAQUETAS", nomeSistema: "CONTAGEM DE PLAQUETAS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020029" },
-                { solicitado: "Potássio", nomeSistema: "DOSAGEM DE POTASSIO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010600" },
-                { solicitado: "PROGESTERONA", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Prolactina", nomeSistema: "DOSAGEM DE PROLACTINA", preparo: "Jejum aconselhável de 4 horas. Manter paciente em repouso 30 minutos antes da coleta.", prazo: "08 DIAS ÚTEIS", codigoSus: "0202060306" },
-                { solicitado: "Proteinas totais e frações", nomeSistema: "DOSAGEM DE PROTEINAS TOTAIS E FRACOES", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010627" },
-                { solicitado: "Proteinúria 24 horas", nomeSistema: "DOSAGEM DE PROTEINAS (URINA DE 24 HORAS)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202050114" },
-                { solicitado: "PROVA DO LAÇO", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "PSA LIVRE E TOTAL", nomeSistema: "DOSAGEM DE ANTIGNO PROSTATICO ESPECIFICO (PSA)", preparo: "Ver preparo de PSA TOTAL", prazo: "05 DIAS ÚTEIS", codigoSus: "202030105" },
-                { solicitado: "PSA TOTAL", nomeSistema: "DOSAGEM DE ANTIGNO PROSTATICO ESPECIFICO (PSA)", preparo: "Jejum de 4 horas. Durante três dias antes da coleta do exames evitar, atividade sexual, exercicios fisicos, andar de moto e/ou bicicleta, andar a cavalo e usar supositórios. Caso tenha realizado os procedimentos ultrasom da prostata, colonoscopía, retossigmoidoscopia. estudo urodinamico, cistoscopia ou biopsia de próstata esperar 30 dias para coletar o exame.", prazo: "05 DIAS ÚTEIS", codigoSus: "202030105" },
-                { solicitado: "Relação albumina/creatinina na urina recente", nomeSistema: "RELACAO ALBUMINA CREATINNINA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202050890" },
-                { solicitado: "Rubéola IGG", nomeSistema: "PESQUISA DE ANTICORPOS IGG CONTRA O VIRUS DA RUBEOLA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030814" },
-                { solicitado: "Rubéola IGM", nomeSistema: "PESQUISA DE ANTICORPOS IGM CONTRA O VIRUS DA RUBEOLA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030920" },
-                { solicitado: "Sarampo (Sorologia IGG e IGM)", nomeSistema: "SOROLOGIA PARA SARAMPO IGG E IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "30 DIAS ÚTEIS", codigoSus: "202030695" },
-                { solicitado: "SDHEA", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Sódio", nomeSistema: "DOSAGEM DE SODIO", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010635" },
-                { solicitado: "Sumário de urina (Urina Tipo 1, EAS)", nomeSistema: "ANALISE DE CARACTERES FISICOS, ELEMENTOS E SEDIMENTO DA URINA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202050017" },
-                { solicitado: "T3", nomeSistema: "DOSAGEM DE TRIIODOTIRONINA (T3)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060390" },
-                { solicitado: "T4", nomeSistema: "DOSAGEM DE TIROXINA (T4)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060373" },
-                { solicitado: "T4 livre", nomeSistema: "DOSAGEM DE TIROXINA LIVRE (T4 LIVRE)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060381" },
-                { solicitado: "TAP (Tempo de atividade de protrombina)", nomeSistema: "DETERMINACAO DE TEMPO E ATIVIDADE DA PROTROMBINA (TAP)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020142" },
-                { solicitado: "TEMPO DE SANGRAMENTO", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "TESTOSTERONA TOTAL", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Teste de tolerância a glicose (75g 2h)", nomeSistema: "DETERMINAÇÃO DE CURVA GLICEMICA 2DOSAGENS", preparo: "Jejum de 8 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "202010040" },
-                { solicitado: "Teste de tolerância a glicose (50g 1h)", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "TIREOGLOBULINA", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Toxoplasmose - Teste de Avidez", nomeSistema: "TESTE DE AVIDEZ PARA TOXOPLASMOSE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "213019999" },
-                { solicitado: "Toxoplasmose IGG", nomeSistema: "PESQUISA DE ANTICORPOS IGG ANTITOXOPLASMA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030768" },
-                { solicitado: "Toxoplasmose IGM", nomeSistema: "PESQUISA DE ANTICORPOS IGM ANTITOXOPLASMA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202030873" },
-                { solicitado: "Transferrina", nomeSistema: "Transferrina", preparo: "Jejum aconselhável de 4 horas.", prazo: "08 DIAS ÚTEIS", codigoSus: "--" },
-                { solicitado: "Triglicerides", nomeSistema: "DOSAGEM DE TRIGLICERIDEOS", preparo: "Jejum de 12 horas", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010678" },
-                { solicitado: "TSH", nomeSistema: "DOSAGEM DE HORMONIO TIREOESTIMULANTE (TSH)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202060250" },
-                { solicitado: "TTPA (Tempo de tromboplastina parcial ativo)", nomeSistema: "DETERMINACAO DE TEMPO DE TROMBOPLASTINA PARCIAL ATIVADA (TTP ATIVADA)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202020134" },
-                { solicitado: "Uréia", nomeSistema: "DOSAGEM DE UREIA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "0202010694" },
-                { solicitado: "Urinocultura", nomeSistema: "CULTURA AUTOMATIZADA DE URINA", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "0202081005" },
-                { solicitado: "VDRL", nomeSistema: "VDRL P/DETECCÃO DE SIFILIS EM GESTANTE", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "05 DIAS ÚTEIS", codigoSus: "0202031179" },
-                { solicitado: "VHS", nomeSistema: "DETERMINACAO DE VELOCIDADE DE HEMOSSEDIMENTACAO (VHS)", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "02 DIAS ÚTEIS", codigoSus: "202020150" },
-                { solicitado: "Vitamina B12", nomeSistema: "DOSAGEM DE VITAMINA B12", preparo: "Jejum aconselhável de 4 horas", prazo: "08 DIAS ÚTEIS", codigoSus: "--" },
-                { solicitado: "Vitamina D (25 OH)", nomeSistema: "DOSAGEM DE 25-HIDROXIVITAMINA D", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "08 DIAS ÚTEIS", codigoSus: "--" },
-                { solicitado: "WAALER ROSE", nomeSistema: "Verificar procedimento", preparo: "Verificar procedimento", prazo: "Verificar procedimento", codigoSus: "--" },
-                { solicitado: "Zika (PCR para Zika Virus)", nomeSistema: "PCR PARA ZIKA VIRUS", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "30 DIAS ÚTEIS", codigoSus: "Sem Cod" },
-                { solicitado: "Zika (Sorologia para Zika - IGM)", nomeSistema: "ANTICORPOS ANTI-ZIKA IGM", preparo: "Sem jejum obrigatório ou preparo específico", prazo: "10 DIAS ÚTEIS", codigoSus: "202030903" }
+                { solicitado: "Albumina", nomeSistema: "ALBUMINA SÉRICA (Agendar como Proteinas Totais e Frações)", codigoSus: "0202011000", correlato: "ALB", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Clearance de creatinina (CLEAR)", nomeSistema: "CLEARANCE DE CREATIΝΙΝΑ", codigoSus: "0202050025", correlato: "CLEAR", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "COAGULOGRAMA", nomeSistema: "COAGULOGRAMA", codigoSus: "0202021000", correlato: "COAG", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "PLAQUETAS", nomeSistema: "CONTAGEM DE PLAQUETAS", codigoSus: "0202020029", correlato: "PLA", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Contagem de reticulócitos", nomeSistema: "CONTAGEM DE RETICULOCITOS", codigoSus: "0202020037", correlato: "RET", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Teste de tolerância a glicose", nomeSistema: "DETERMINAÇÃO DE CURVA GLICEMICA 2DOSAGENS", codigoSus: "202010040", correlato: "TTGO/TOTG/TTOG", prazo: "02 DIAS ÚTEIS", preparo: "Jejum de 8 horas" },
+                { solicitado: "Fator reumatóide", nomeSistema: "DETERMINACAO DE FATOR REUMATOIDE", codigoSus: "0202030075", correlato: "FR/FR LATEX", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Tempo de tromboplastina parcial ativo", nomeSistema: "DETERMINACAO DE TEMPO DE TROMBOPLASTINA PARCIAL ATIVADA (TTP ATIVADA)", codigoSus: "0202020134", correlato: "TTPA/TTP", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Tempo de atividade de protrombina", nomeSistema: "DETERMINACAO DE TEMPO E ATIVIDADE DA PROTROMBINA (TAP)", codigoSus: "0202020142", correlato: "TAP/TP", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Grupo sanguineo/fatorRh (GRUPO ABO)", nomeSistema: "DETERMINACAO DIRETA E REVERSA DE GRUPO ABO", codigoSus: "0202120023", correlato: "ABO/ABO RH", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Proteína C reativa", nomeSistema: "DETERMINACAO QUANTITATIVA DE PROTEINA C REATIVA", codigoSus: "0202030083", correlato: "PCR/PROTΕΙΝΑ C", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Ácido úrico", nomeSistema: "DOSAGEM DE ACIDO URICO", codigoSus: "0202010120", correlato: "AUR", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Amilase", nomeSistema: "DOSAGEM DE AMILASE", codigoSus: "0202010180", correlato: "AMI", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Bilirrubina total e frações", nomeSistema: "DOSAGEM DE BILIRRUBINA TOTAL E FRACOES", codigoSus: "0202010201", correlato: "BIL/BIL DIRETA/BILIRRUBINA INDIRETA", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico:" },
+                { solicitado: "Cálcio total", nomeSistema: "DOSAGEM DE CALCIO", codigoSus: "202010210", correlato: "CAL/Ca", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Cloro", nomeSistema: "DOSAGEM DE CLORETO", codigoSus: "0202010260", correlato: "CLO", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Colesterol HDL", nomeSistema: "DOSAGEM DE COLESTEROL HDL", codigoSus: "0202010279", correlato: "HDL", prazo: "02 DIAS ÚTEIS", preparo: "Jejum de 12 horas" },
+                { solicitado: "LDL-colesterol", nomeSistema: "DOSAGEM DE COLESTEROL LDL", codigoSus: "0202010287", correlato: "LDL", prazo: "02 DIAS ÚTEIS", preparo: "Jejum de 12 horas" },
+                { solicitado: "Colesterol total", nomeSistema: "DOSAGEM DE COLESTEROL TOTAL", codigoSus: "0202010295", correlato: "COT", prazo: "02 DIAS ÚTEIS", preparo: "Jejum de 12 horas" },
+                { solicitado: "Creatinina", nomeSistema: "DOSAGEM DE CREATIΝΙΝΑ", codigoSus: "0202010317", correlato: "CRE/C", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Fosfatase alcalina", nomeSistema: "DOSAGEM DE FOSFATASE ALCALINA", codigoSus: "0202010422", correlato: "FAL/FA/FA", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Gama gt-gama glutamiltransferase", nomeSistema: "DOSAGEM DE GAMA-GLUTAMIL-TRANSFERASE (GAMA GT)", codigoSus: "0202010465", correlato: "GGT", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Glicose", nomeSistema: "DOSAGEM DE GLICOSE", codigoSus: "0202010473", correlato: "GLIC/GLICEMIA", prazo: "02 DIAS ÚTEIS", preparo: "Jejum de 8 horas" },
+                { solicitado: "Lipase", nomeSistema: "DOSAGEM DE LIPASE", codigoSus: "0202010554", correlato: "LPA", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Microalbuminúria urina recente", nomeSistema: "DOSAGEM DE MICROALBUMINURIA EM AMOSTRA DE URINA ISOLADA", codigoSus: "202050889", correlato: "ALBUR/ALBUMINÚRIA", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Microalbuminúria urina 24 horas", nomeSistema: "DOSAGEM DE MICROALBUMINURIA NA URINA DE 24H", codigoSus: "202050888", correlato: "MAM", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Potássio", nomeSistema: "DOSAGEM DE POTASSIO", codigoSus: "0202010600", correlato: "POT/K+", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico", note: "Colocar caso médico solicite Eletrólitos ex: Sod, Pot, Cal" },
+                { solicitado: "Proteinúria urina 24 horas", nomeSistema: "DOSAGEM DE PROTEINAS (URINA DE 24 HORAS)", codigoSus: "0202050114", correlato: "P24", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Proteínas totais e frações", nomeSistema: "DOSAGEM DE PROTEINAS TOTAIS E FRACOES", codigoSus: "0202010627", correlato: "PTF", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Sódio", nomeSistema: "DOSAGEM DE SODIO", codigoSus: "0202010635", correlato: "SOD/Na+", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico", note: "Colocar caso médico solicite Eletrólitos ex: Sod, Pot, Cal" },
+                { solicitado: "TGO-transaminase glutamico oxalacética", nomeSistema: "DOSAGEM DE TRANSAMINASE GLUTAMICO-OXALACETICA (TGO)", codigoSus: "0202010643", correlato: "TGO/AST", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "TGP-transaminase glutâmico piruvica", nomeSistema: "DOSAGEM DE TRANSAMINASE GLUTAMICO-PIRUVICA (TGP)", codigoSus: "0202010651", correlato: "TGP/ALT", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Triglicerides", nomeSistema: "DOSAGEM DE TRIGLICERIDEOS", codigoSus: "0202010678", correlato: "TRI", prazo: "02 DIAS ÚTEIS", preparo: "Jejum de 12 horas" },
+                { solicitado: "Uréia", nomeSistema: "DOSAGEM DE UREIA", codigoSus: "0202010694", correlato: "URE/U", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "ERITROGRAMA", nomeSistema: "ERITROGRAMA (ERITROCITOS, HEMOGLOBINA, HEMATOCRITO)", codigoSus: "0202020363", correlato: "CADASTRAR COMO HEM", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Hemograma completo", nomeSistema: "HEMOGRAMA COMPLETO", codigoSus: "0202020380", correlato: "HEM/HC", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "LEUCOGRAMA", nomeSistema: "LEUCOGRAMA", codigoSus: "0202020398", correlato: "LEU", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Relação albumina/creatinina na urina recente", nomeSistema: "RELACAO ALBUMINA CREATINNINA", codigoSus: "202050890", correlato: "RCRAL", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Coombs direto", nomeSistema: "TESTE DIRETO DE ANTIGLOBULINA HUMANA (TAD)", codigoSus: "0202020541", correlato: "COOI", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "VDRL", nomeSistema: "VDRL P/DETECÇÃO DE SIFILIS EM GESTANTE", codigoSus: "0202031179", correlato: "VDRL/SÍFILIS", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "PSA TOTAL", nomeSistema: "DOSAGEM DE ANTIGNO PROSTATICO ESPECIFICO (PSA)", codigoSus: "202030105", correlato: "PSA", prazo: "05 DIAS ÚTEIS", preparo: "Jejum de 4 horas. Durante três dias antes da coleta do exames evitar, atividade sexual, exercicios fisicos, andar de moto e/ou bicicleta, andar a cavalo e usar supositórios. Caso tenha realizado os procedimentos ultrasom da prostata, colonoscopía, retossigmoidoscopia. estudo urodinamico, cistoscopia ou biopsia de próstata esperar 30 dias para coletar o exame." },
+                { solicitado: "Ferro sérico", nomeSistema: "DOSAGEM DE FERRO SERICO", codigoSus: "0202010392", correlato: "FER", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Beta hcg", nomeSistema: "DOSAGEM DE GONADOTROFINA CORIONICA HUMANA (HCG, BETA HCG)", codigoSus: "0202060217", correlato: "HCGQ/TESTE DE GRAVIDEZ", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "TSH", nomeSistema: "DOSAGEM DE HORMONIO TIREOESTIMULANTE (TSH)", codigoSus: "0202060250", correlato: "TSH", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "T4", nomeSistema: "DOSAGEM DE TIROXINA (T4)", codigoSus: "0202060373", correlato: "T4", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "T4 livre", nomeSistema: "DOSAGEM DE TIROXINA LIVRE (T4 LIVRE)", codigoSus: "0202060381", correlato: "T4L", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "T3", nomeSistema: "DOSAGEM DE TRIIODOTIRONINA (T3)", codigoSus: "0202060390", correlato: "T3", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Hepatite B- anti HBC TOTAL", nomeSistema: "PESQUISA DE ANTIC. IGG E IGM CONTRA ANTIGENO CENTRAL DO VIRUS DA HEPATITE B", codigoSus: "202030784", correlato: "AHBC", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "HIV 1 e 2-GESTANTE", nomeSistema: "PESQUISA LABORATORIAL DE ANTIGENOS DE HIV OU ANTICORPOS ANTI-HIV-1 OU ANTI-HIV-2 EM GESTANTE", codigoSus: "0202031519", correlato: "HIV12", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "HIV 1 e 2-PARCEIRO E PARCERIA DE GESTANTE", nomeSistema: "PESQUISA LABORATORIAL DE ANTIGENOS DE HIV OU ANTICORPOS ANTI-HIV-1 OU ANTI-HIV-2 EM PARCEIRO E PARCERIA DE GESTANTE", codigoSus: "0202031527", correlato: "HIV12", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "HIV 1 e 2-POPULAÇÃO GERAL (EXCETO GESTANTE, PARCEIRO OU PARCERIA)", nomeSistema: "PESQUISA LABORATORIAL DE ANTÍGENOS DE HIV E/OU ANTICORPOS ANTI-HIV-1 OU ANTI-HIV-2 PARA POPULAÇÃO GERAL (EXCETO GESTANTE, PARCEIRO OU PARCERIA)", codigoSus: "0202031500", correlato: "HIV12", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Hepatite B- anti HBS", nomeSistema: "PESQUISA DE ANTICORPOS CONTRA ANTIGENO DE SUPERFICIE DO VIRUS DA HEPATITE B (ANTI-HBS)", codigoSus: "0202030636", correlato: "HBS", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Hepatite C-anti HCV (GESTANTE)", nomeSistema: "PESQUISA LABORATORIAL DE ANTICORPOS CONTRA O VÍRUS DA HEPATITE C (ANTI-HCV) EM GESTANTE", codigoSus: "0202031489", correlato: "HCV", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Hepatite C- anti HCV (PARCEIRO OU PARCERIA DE GESTANTE)", nomeSistema: "PESQUISA LABORATORIAL DE ANTICORPOS CONTRA O VÍRUS DA HEPATITE C (ANTI-HCV) EM PARCEIRO OU PARCERIA DE GESTANTE", codigoSus: "0202031497", correlato: "HCV", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Hepatite C-anti HCV - POPULAÇÃO GERAL (EXCETO GESTANTE, PARCEIRO OU PARCERIA)", nomeSistema: "PESQUISA LABORATORIAL DE ANTICORPOS CONTRA O VÍRUS DA HEPATITE C (ANTI-HCV) PARA POPULAÇÃO GERAL (EXCETO GESTANTE, PARCEIRO OU PARCERIA)", codigoSus: "0202031470", correlato: "HCV", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Hepatite B-HBSAG (GESTANTE)", nomeSistema: "PESQUISA LABORATORIAL DE ANTIGENO DE SUPERFICIE DO VIRUS DA HEPATITE B (HBSAG) EM GESTANTE", codigoSus: "0202031454", correlato: "HBG", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Hepatite B-HBSAG (PARCEIRO OU PARCERIA DE GESTANTE)", nomeSistema: "PESQUISA LABORATORIAL DE ANTIGENO DE SUPERFÍCIE DO VIRUS DA HEPATITE B (HBSAG) EM PARCEIRO OU PARCERIA DE GESTANTE", codigoSus: "0202031462", correlato: "HBG", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Hepatite B- HBSAG - POPULAÇÃO GERAL (EXCETO GESTANTE, PARCEIRO OU PARCERIA)", nomeSistema: "PESQUISA LABORATORIAL DE ANTIGENO DE SUPERFÍCIE DO VIRUS DA HEPATITE B (HBSAG) PARA POPULAÇÃO GERAL (EXCETO GESTANTE, PARCEIRO OU PARCERIA)", codigoSus: "0202031446", correlato: "HBG", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Pesquisa de leucócitos", nomeSistema: "PESQUISA DE LEUCOCITOS NAS FEZES", codigoSus: "0202040097", correlato: "CADASTRAR COMO HEM", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Pesquisa de rotavirus", nomeSistema: "PESQUISA DE ROTAVIRUS NAS FEZES", codigoSus: "0202040135", correlato: "ROT/ROT FEZES", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Pesquisa de sangue oculto", nomeSistema: "PESQUISA DE SANGUE OCULTO NAS FEZES", codigoSus: "0202040143", correlato: "SOF", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Pesquisa de substância redutora", nomeSistema: "PESQUISA DE SUBSTANCIAS REDUTORAS NAS FEZES", codigoSus: "0202040151", correlato: "SRF", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Sumário de urina", nomeSistema: "ANALISE DE CARACTERES FISICOS, ELEMENTOS E SEDIMENTO DA URINA", codigoSus: "0202050017", correlato: "SU/EAS/URINA TIPO 1", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Bacterioscopia(Gram, Ziehl)", nomeSistema: "BACTERIOSCOPIA (GRAM)", codigoSus: "0202080072", correlato: "", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Cultura de fezes", nomeSistema: "CULTURA AUTOMATIZADA DE FEZES", codigoSus: "0202081001", correlato: "CUF", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Urinocultura", nomeSistema: "CULTURA AUTOMATIZADA DE URINA", codigoSus: "0202081005", correlato: "CUU/CULTURA DE URINA", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Cultura de orofaringe", nomeSistema: "CULTURA AUTOMATIZADA OROFARINGE", codigoSus: "0202081003", correlato: "CAO", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Cultura para fungos", nomeSistema: "CULTURA PARA IDENTIFICAÇÃO DE FUNGOS", codigoSus: "0202080137", correlato: "CFU", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Capacidade Total de fixação de ferro", nomeSistema: "DETERMINACAO DE CAPACIDADE DE FIXACAO DO FERRO", codigoSus: "0202010023", correlato: "CFF", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Ácido valproico", nomeSistema: "DOSAGEM DE ACIDO VALPROICO", codigoSus: "0202070050", correlato: "ACV", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Capacidade Latente de fixação de ferro", nomeSistema: "DOSAGEM DE CAPACIDADE LATENTE DE FIXAÇÃO DO FERRO", codigoSus: "0202011001", correlato: "CLF", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Carbamazepina", nomeSistema: "DOSAGEM DE CARBAMAZΕΡΙΝΑ", codigoSus: "0202070158", correlato: "CBZ", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum de obrigatório. Colher preferencialmente antes da proxima dose." },
+                { solicitado: "FENITOINA", nomeSistema: "DOSAGEM DE FENITOINA", codigoSus: "202070220", correlato: "FNT", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum de obrigatório. Colher preferencialmente antes da proxima dose." },
+                { solicitado: "Fenobarbital", nomeSistema: "DOSAGEM DE FENOBARBITAL", codigoSus: "0202071000", correlato: "FBB", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum de obrigatório. Colher preferencialmente antes da proxima dose." },
+                { solicitado: "Ferritina", nomeSistema: "DOSAGEM DE FERRITΙΝΑ", codigoSus: "0202010384", correlato: "FRT", prazo: "05 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "HEMOGLOBINA GLICADA", nomeSistema: "DOSAGEM DE HEMOGLOBINA GLICOSILADA", codigoSus: "0202010503", correlato: "AIC", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Litio", nomeSistema: "DOSAGEM DE LITIO", codigoSus: "0202070255", correlato: "LIT", prazo: "08 DIAS ÚTEIS", preparo: "Jejum de 8 horas. Recomenda-se a coleta 12 horas após a administração do medicamento." },
+                { solicitado: "Prolactina", nomeSistema: "DOSAGEM DE PROLACTINA", codigoSus: "0202060306", correlato: "PROL", prazo: "08 DIAS ÚTEIS", preparo: "Jejum aconselhável de 4 horas. Manter paciente em repouso 30 minutos antes da coleta." },
+                { solicitado: "Indice de saturação de transferrina IST", nomeSistema: "DOSAGEM DO INDICE DE SATURAÇÃO DA TRANSFERRINA", codigoSus: "0202011009", correlato: "IST", prazo: "08 DIAS ÚTEIS", preparo: "Jejum de 8 horas." },
+                { solicitado: "Transferrina", nomeSistema: "Transferrina", codigoSus: "--", correlato: "TRF", prazo: "08 DIAS ÚTEIS", preparo: "Jejum aconselhável de 4 horas." },
+                { solicitado: "Eletroforese de hemoglobina", nomeSistema: "ELETROFORESE DE HEMOGLOBINA", codigoSus: "0202020355", correlato: "ELH", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico.", note: "COLHER 1 EDTA EXCLUSIVO PARA ESTE EXAME" },
+                { solicitado: "HIV- Western BLOT", nomeSistema: "PESQUISA DE ANTICORPOS ANTI-HIV-1 (WESTERN BLOT)", codigoSus: "0202030296", correlato: "", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "ASO- ANTIESTREPTOLISINA O", nomeSistema: "PESQUISA DE ANTICORPOS ANTIESTREPTOLISINA O (ASLO)", codigoSus: "0202030474", correlato: "ASO", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico." },
+                { solicitado: "FAN", nomeSistema: "PESQUISA DE ANTICORPOS ANTINUCLEO", codigoSus: "0202030598", correlato: "FAN/FATOR ANTINUCLEO", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Citomegalovirus- Anticorpos IGG", nomeSistema: "PESQUISA DE ANTICORPOS IGG ANTICITOMEGALOVIRUS", codigoSus: "0202030741", correlato: "CMG", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Toxoplasmose IGG", nomeSistema: "PESQUISA DE ANTICORPOS IGG ANTITOXOPLASMA", codigoSus: "0202030768", correlato: "TOXG", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Rubéola IGG", nomeSistema: "PESQUISA DE ANTICORPOS IGG CONTRA O VIRUS DA RUBEOLA", codigoSus: "0202030814", correlato: "RUBG", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Citomegalovirus- Anticorpos IGM", nomeSistema: "PESQUISA DE ANTICORPOS IGM ANTICITOMEGALOVIRUS", codigoSus: "0202030857", correlato: "CMM", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Toxoplasmose IGM", nomeSistema: "PESQUISA DE ANTICORPOS IGM ANTITOXOPLASMA", codigoSus: "0202030873", correlato: "TOXM", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Rubéola IGM", nomeSistema: "PESQUISA DE ANTICORPOS IGM CONTRA O VIRUS DA RUBEOLA", codigoSus: "0202030920", correlato: "RUBM", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "TOXOPLASMOSE AVIDEZ", nomeSistema: "TESTE DE AVIDEZ PARA TOXOPLASMOSE", codigoSus: "213019999", correlato: "TOXAV", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "FTABS IGG", nomeSistema: "TESTE FTA-ABS IGG P/ DIAGNOSTICO DA SIFILIS", codigoSus: "0202031128", correlato: "FTAG", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "FTABS IGM", nomeSistema: "TESTE FTA-ABS IGM P/ DIAGNOSTICO DA SIFILIS", codigoSus: "0202031136", correlato: "FTAM", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Coombs indireto", nomeSistema: "TESTE INDIRETO DE ANTIGLOBULINA HUMANA (TIA)", codigoSus: "0202120090", correlato: "COOI", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "k-39", nomeSistema: "TESTE RAPIDO LEISHMANIOSE K39", codigoSus: "202030903", correlato: "K39/LEISHMANIOSE/CALAZAR", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "VHS", nomeSistema: "DETERMINACAO DE VELOCIDADE DE HEMOSSEDIMENTACAO (VHS)", codigoSus: "202020150", correlato: "VHS", prazo: "02 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "HEPATITE B ANTI HBE", nomeSistema: "PESQUISA DE ANTICORPOS CONTRA ANTIGENO E DO VIRUS DA HEPATITE B (ANTI-HBE)", codigoSus: "202030644", correlato: "HBE", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "HEPATITE B HBEAG", nomeSistema: "PESQUISA DE ANTIGENO E DO VIRUS DA HEPATITE B (HBEAG)", codigoSus: "202030989", correlato: "HBEAG", prazo: "08 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Doença de Chagas IGG", nomeSistema: "PESQUISA DE ANTICORPOS IGG ANTITRYPANOSOMA CRUZI CHAGAS IGG", codigoSus: "202030900", correlato: "", prazo: "10 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Doença de Chagas IGM", nomeSistema: "PESQUISA DE ANTICORPOS IGM ANTITRYPANOSOMA CRUZI CHAGAS IGM", codigoSus: "202030901", correlato: "", prazo: "10 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Dengue/Sorologia para Dengue", nomeSistema: "ANTICORPOS ANTI-DENGUE IGM", codigoSus: "202030792", correlato: "", prazo: "10 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico." },
+                { solicitado: "NS1", nomeSistema: "DETECÇÃO DO ANTIGENO NS1 DENGUE", codigoSus: "Sem Cod", correlato: "", prazo: "10 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Dengue Isolamento Viral", nomeSistema: "ISOLAMENTO VIRAL DA DENGUE", codigoSus: "Sem Cod", correlato: "", prazo: "30 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "Sarampo", nomeSistema: "SOROLOGIA PARA SARAMPO IGG E IGM", codigoSus: "202030695", correlato: "", prazo: "30 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "CHIKUNGUNYA", nomeSistema: "ANTICORPOS ANTI-CHIKUNGUNYA IGM", codigoSus: "202030903", correlato: "", prazo: "10 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Calazar", nomeSistema: "SOROLOGIA PARA LEISHMANIOSE", codigoSus: "Sem Cod", correlato: "", prazo: "10 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo especifico" },
+                { solicitado: "Sorologia para Zika", nomeSistema: "ANTICORPOS ANTI-ZIKA IGM", codigoSus: "202030903", correlato: "", prazo: "10 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
+                { solicitado: "PCR PARA ZIKA VIRUS", nomeSistema: "PCR PARA ZIKA VIRUS", codigoSus: "Sem Cod", correlato: "", prazo: "30 DIAS ÚTEIS", preparo: "Sem jejum obrigatório ou preparo específico" },
             ];
 
 
             // Get elements from the DOM
             const selector = document.getElementById('examSelector');
             const resultsDiv = document.getElementById('results');
-            const systemExamNameEl = document.getElementById('systemExamName');
+            const fastMedicNameEl = document.getElementById('fastMedicName');
             const susCodeEl = document.getElementById('susCode');
             const preparationEl = document.getElementById('preparation');
             const deliveryTimeEl = document.getElementById('deliveryTime');
@@ -248,27 +217,35 @@
             const noteCard = document.getElementById('noteCard');
             const noteEl = document.getElementById('note');
 
-            // --- Function to create a comprehensive list including aliases ---
+            // --- Function to create a comprehensive list including aliases from 'solicitado' and 'correlato' ---
             function createComprehensiveList(data) {
                 const comprehensiveData = [];
                 const seen = new Set();
 
                 data.forEach(exam => {
+                    const originalName = exam.solicitado.trim();
+                    
                     // Add the main exam name if not already added
-                    if (!seen.has(exam.solicitado.toLowerCase())) {
-                        comprehensiveData.push(exam);
-                        seen.add(exam.solicitado.toLowerCase());
+                    if (!seen.has(originalName.toLowerCase())) {
+                        comprehensiveData.push({ ...exam, displayLabel: originalName });
+                        seen.add(originalName.toLowerCase());
                     }
 
-                    // Add aliases from description, e.g. "Glicose / Glicemia"
-                    const aliasesInDesc = exam.solicitado.split('/').map(s => s.trim());
-                    if (aliasesInDesc.length > 1) {
-                        aliasesInDesc.forEach(alias => {
-                            if (!seen.has(alias.toLowerCase())) {
-                                comprehensiveData.push({ ...exam, solicitado: alias });
-                                seen.add(alias.toLowerCase());
-                            }
-                        });
+                    // Function to process and add aliases
+                    const addAlias = (alias) => {
+                        const cleanedAlias = alias.trim();
+                        if (cleanedAlias && !seen.has(cleanedAlias.toLowerCase())) {
+                           comprehensiveData.push({ ...exam, displayLabel: cleanedAlias });
+                           seen.add(cleanedAlias.toLowerCase());
+                        }
+                    };
+
+                    // Add aliases from 'solicitado' field (e.g., "Glicose / Glicemia")
+                    originalName.split('/').forEach(addAlias);
+                    
+                    // Add aliases from 'correlato' field (e.g., "GLIC/GLICEMIA")
+                    if (exam.correlato) {
+                        exam.correlato.split('/').forEach(addAlias);
                     }
                 });
                  return comprehensiveData;
@@ -276,25 +253,25 @@
 
             const comprehensiveExamData = createComprehensiveList(examData);
 
-            // Sort data alphabetically by the 'solicitado' property
-            comprehensiveExamData.sort((a, b) => a.solicitado.localeCompare(b.solicitado));
+            // Sort data alphabetically by the 'displayLabel' property
+            comprehensiveExamData.sort((a, b) => a.displayLabel.localeCompare(b.displayLabel));
 
             // Populate the dropdown with exam options
             comprehensiveExamData.forEach((exam, index) => {
                 const option = document.createElement('option');
                 option.value = index;
-                option.textContent = exam.solicitado;
+                option.textContent = exam.displayLabel;
                 selector.appendChild(option);
             });
 
             // Listen for changes on the selector
             selector.addEventListener('change', () => {
                 const selectedIndex = selector.value;
-                if (selectedIndex) {
+                if (selectedIndex && selectedIndex !== "") {
                     const selectedExam = comprehensiveExamData[selectedIndex];
 
                     // Populate the result fields
-                    systemExamNameEl.textContent = selectedExam.nomeSistema;
+                    fastMedicNameEl.textContent = selectedExam.nomeSistema;
                     susCodeEl.textContent = selectedExam.codigoSus || '--';
                     preparationEl.textContent = selectedExam.preparo;
                     deliveryTimeEl.textContent = selectedExam.prazo;
@@ -318,7 +295,7 @@
 
             // Handle the copy button click
             copyButton.addEventListener('click', () => {
-                const textToCopy = systemExamNameEl.textContent;
+                const textToCopy = fastMedicNameEl.textContent;
                 // Use a temporary textarea to securely copy to clipboard
                 const tempTextArea = document.createElement('textarea');
                 tempTextArea.value = textToCopy;
@@ -347,3 +324,4 @@
     </script>
 </body>
 </html>
+
